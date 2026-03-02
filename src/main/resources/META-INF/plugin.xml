@@ -1,18 +1,18 @@
 <idea-plugin>
     <id>me.bytebeats.mns</id>
-    <name>Luckey Clover</name>
-    <vendor email="bvzgong@gmail.com" url="https://github.com/bytebeats">bytebeats</vendor>
+    <name>Lucky Clover</name>
+    <vendor email="bvzgong@gmail.com" url="https://github.com/SilverTime">SilverTime</vendor>
     <version>2.2.0</version>
     <idea-version since-build="242" until-build="251.*"/>
 
     <description><![CDATA[
-    Luckey Clover!
+    Lucky Clover!
     IntelliJ IDEA platform plugin. Supports instant stock market from USA, HK and China mainland.<br>
     IntelliJ IDEA 平台插件, 支持<b>股票</b>, <b>基金</b>和<b>数字货币</b>的行情数据的实时更新, 其中股票包括<b>美股</b>, <b>港股</b>和宇宙第一大<b>A股</b>!.<br>
     插件名为幸运草，希望大家都有好运!<br>
     Good luck!<br>
-    The most important thing is: Try <b>mns</b> and spread the word!<br>
-    使用说明: https://github.com/bytebeats/mns
+    The most important thing is: Try <b>lucky-clover</b> and spread the word!<br>
+    使用说明: https://github.com/SilverTime/lucky-clover
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>

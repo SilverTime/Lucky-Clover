@@ -11,7 +11,7 @@ plugins {
     id("org.jetbrains.intellij.platform") version "2.5.0"
 }
 
-group = "io.github.bytebeats"
+group = "io.github.silvertime"
 version = "2.2.0"
 
 repositories {
@@ -106,7 +106,7 @@ tasks {
     register<Copy>("MoveBuildArtifacts") {
         mustRunAfter("DeletePluginFiles")
         from(layout.buildDirectory.dir("distributions"))
-        include("mns-$version.zip")
+        include("lucky-clover-$version.zip")
         into("plugins")
     }
 

@@ -1,14 +1,16 @@
 # Lucky Clover
 
-[![GitHub latest commit](https://badgen.net/github/last-commit/bytebeats/mns)](https://github.com/bytebeats/mns/commit/)
-[![GitHub contributors](https://img.shields.io/github/contributors/bytebeats/mns.svg)](https://github.com/bytebeats/mns/graphs/contributors/)
-[![GitHub issues](https://img.shields.io/github/issues/bytebeats/mns.svg)](https://github.com/bytebeats/mns/issues/)
-[![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github)](https://github.com/bytebeats/mns/)
+> 基于 [mns (Money Never Sleeps)](https://github.com/bytebeats/mns) 开发，开发时原项目为 MIT License
+
+[![GitHub latest commit](https://badgen.net/github/last-commit/SilverTime/lucky-clover)](https://github.com/SilverTime/lucky-clover/commit/)
+[![GitHub contributors](https://img.shields.io/github/contributors/SilverTime/lucky-clover.svg)](https://github.com/SilverTime/lucky-clover/graphs/contributors/)
+[![GitHub issues](https://img.shields.io/github/issues/SilverTime/lucky-clover.svg)](https://github.com/SilverTime/lucky-clover/issues/)
+[![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github)](https://github.com/SilverTime/lucky-clover/)
 [![JetBrains Plugins](https://img.shields.io/jetbrains/plugin/v/14801-mns.svg)](https://plugins.jetbrains.com/plugin/14801-money-never-sleeps)
 [![JetBrains Plugins](https://img.shields.io/jetbrains/plugin/r/rating/14801)](https://plugins.jetbrains.com/plugin/14801-money-never-sleeps)
-[![GitHub forks](https://img.shields.io/github/forks/bytebeats/mns.svg?style=social&label=Fork&maxAge=2592000)](https://github.com/bytebeats/mns/network/)
-[![GitHub stars](https://img.shields.io/github/stars/bytebeats/mns.svg?style=social&label=Star&maxAge=2592000)](https://github.com/bytebeats/mns/stargazers/)
-[![GitHub watchers](https://img.shields.io/github/watchers/bytebeats/mns.svg?style=social&label=Watch&maxAge=2592000)](https://github.com/bytebeats/mns/watchers/)
+[![GitHub forks](https://img.shields.io/github/forks/SilverTime/lucky-clover.svg?style=social&label=Fork&maxAge=2592000)](https://github.com/SilverTime/lucky-clover/network/)
+[![GitHub stars](https://img.shields.io/github/stars/SilverTime/lucky-clover.svg?style=social&label=Star&maxAge=2592000)](https://github.com/SilverTime/lucky-clover/stargazers/)
+[![GitHub watchers](https://img.shields.io/github/watchers/SilverTime/lucky-clover.svg?style=social&label=Watch&maxAge=2592000)](https://github.com/SilverTime/lucky-clover/watchers/)
 
 IntelliJ IDEA平台插件. 支持查看股票实时行情. 支持<b>股票</b>, <b>基金</b>和<b>数字货币</b>. 其中股票包括<b>美股</b>, <b>港股</b>和 <b>A 股</b>.
 
@@ -66,6 +68,7 @@ Fund Query:
 ## MIT License
 
     Copyright (c) 2021 Chen Pan
+    Copyright (c) 2026 SilverTime
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
