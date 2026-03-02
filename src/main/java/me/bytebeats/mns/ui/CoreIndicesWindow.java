@@ -1,0 +1,104 @@
+package me.bytebeats.mns.ui;
+
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.PopupStep;
+import com.intellij.openapi.ui.popup.util.BaseListPopupStep;
+import com.intellij.ui.awt.RelativePoint;
+import me.bytebeats.mns.OnSymbolSelectedListener;
+import me.bytebeats.mns.SymbolParser;
+import me.bytebeats.mns.enumation.StockChartType;
+import me.bytebeats.mns.handler.TencentIndexHandler;
+import me.bytebeats.mns.listener.OnItemRightClickListener;
+import me.bytebeats.mns.tool.PopupsUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class CoreIndicesWindow implements SymbolParser {
+    private JPanel indices_window;
+    private JScrollPane indices_scroll;
+    private JTable indices_table;
+    private JLabel indices_timestamp;
+    private JButton indices_sync;
+
+    private final TencentIndexHandler handler;
+
+    public CoreIndicesWindow() {
+        handler = new TencentIndexHandler(indices_table, indices_timestamp);
+        handler.setOnItemDoubleClickListener((s, xOnScreen, yOnScreen) -> PopupsUtil.INSTANCE.popupStockChart(s, StockChartType.Minute, new Point(xOnScreen, yOnScreen)));
+        handler.setOnItemRightClickListener(new OnItemRightClickListener<String>() {
+            @Override
+            public void onItemRightClick(String s, int xOnScreen, int yOnScreen) {
+                JBPopupFactory.getInstance()
+                        .createListPopup(new BaseListPopupStep<StockChartType>("K线图", StockChartType.values()) {
+                            @Override
+                            public @NotNull
+                            String getTextFor(StockChartType value) {
+                                return value.getDescription();
+                            }
+
+                            @Override
+                            public @Nullable
+                            PopupStep<?> onChosen(StockChartType selectedValue, boolean finalChoice) {
+                                PopupsUtil.INSTANCE.popupStockChart(s, selectedValue, new Point(xOnScreen, yOnScreen));
+                                return super.onChosen(selectedValue, finalChoice);
+                            }
+                        })
+                        .show(RelativePoint.fromScreen(new Point(xOnScreen, yOnScreen)));
+            }
+        });
+    }
+
+    public void setOnSymbolSelectedListener(OnSymbolSelectedListener listener) {
+        handler.setOnSymbolSelectedListener(listener);
+    }
+
+    public JPanel getJPanel() {
+        return indices_window;
+    }
+
+    public void onInit() {
+        // 先停止旧的定时器，避免多个定时器同时运行
+        handler.stop();
+        
+        indices_sync.addActionListener(e -> {
+            syncRefresh();
+        });
+        syncRefresh();
+    }
+
+    private void syncRefresh() {
+        handler.load(parse());
+    }
+
+    @Override
+    public String prefix() {
+//        return "";//实时数据
+        return "s_";//简要信息
+    }
+
+    @Override
+    public String raw() {
+        String indices = AppSettingState.getInstance().coreIndices;
+        if (indices == null || indices.trim().isEmpty()) {
+            return AppSettingState.ALL_INDICES;
+        }
+        return indices;
+    }
+
+    @Override
+    public List<String> parse() {
+        List<String> symbols = new ArrayList<>();
+        String raw = raw();
+        assert raw != null;
+        if (!raw.isEmpty()) {
+            Arrays.stream(raw.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add(prefix() + s));
+        }
+        return symbols;
+    }
+}
