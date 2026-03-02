@@ -1,8 +1,8 @@
 <idea-plugin>
-    <id>me.bytebeats.mns</id>
+    <id>me.SilverTime.lucky-clover</id>
     <name>Lucky Clover</name>
     <vendor email="bvzgong@gmail.com" url="https://github.com/SilverTime">SilverTime</vendor>
-    <version>2.2.0</version>
+    <version>1.0.0</version>
     <idea-version since-build="242" until-build="251.*"/>
 
     <description><![CDATA[
@@ -22,31 +22,31 @@
                 serviceImplementation="me.bytebeats.mns.ui.AppSettingState"/>
 
         <toolWindow
-                id="LuckyC"
-                displayName="LuckyC"
-                icon="/icon_mns.png"
+                id="Lucky Clover"
+                displayName="Lucky Clover"
+                icon="/icon_lucky_clover.png"
                 anchor="left"
                 factoryClass="me.bytebeats.mns.ui.MainWindow"/>
 
         <applicationConfigurable
-                id="mns_setting"
+                id="lucky-clover-setting"
                 instance="me.bytebeats.mns.ui.SettingWindow"
-                displayName="Luckey Clover"/>
+                displayName="Lucky Clover"/>
 
         <notificationGroup
                 displayType="NONE"
-                id="Mns Log"
+                id="Lucky Log"
                 isLogByDefault="true"/>
 
         <notificationGroup
                 displayType="BALLOON"
-                id="Mns Balloon"
+                id="Lucky Balloon"
                 isLogByDefault="true"/>
 
         <notificationGroup
                 displayType="TOOL_WINDOW"
-                id="Mns Tool Window"
-                toolWindowId="Mns Tool Window"
+                id="Lucky Tool Window"
+                toolWindowId="Lucky Clover"
                 isLogByDefault="true"/>
 
     </extensions>

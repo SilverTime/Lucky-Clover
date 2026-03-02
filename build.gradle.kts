@@ -12,7 +12,7 @@ plugins {
 }
 
 group = "io.github.silvertime"
-version = "2.2.0"
+version = "1.0.0"
 
 repositories {
     maven {
@@ -47,13 +47,11 @@ intellijPlatform {
     pluginConfiguration {
         ideaVersion {
             sinceBuild = "242"
-            untilBuild = "252.*"
+            untilBuild = "253.*"
         }
 
         changeNotes = """
-      v1.8.4 k-line chart of stock.<br>
-      v2.0.0 giant upgrade to the project and bugfix.<br>
-      v2.1.0 upgrade mns with Java 21 and Idea 2025.1.<br>
+      v1.0.0 initial release.<br>
     """.trimIndent()
     }
 
@@ -69,7 +67,7 @@ intellijPlatform {
                 types = listOf(IntelliJPlatformType.IntellijIdeaCommunity, IntelliJPlatformType.AndroidStudio)
                 channels = listOf(ProductRelease.Channel.RELEASE)
                 sinceBuild = "242"
-                untilBuild = "252.*"
+                untilBuild = "253.*"
             }
         }
     }

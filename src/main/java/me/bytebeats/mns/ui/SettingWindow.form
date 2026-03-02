@@ -7,7 +7,7 @@
     </constraints>
     <properties>
       <foreground color="-5719366"/>
-      <toolTipText value="Luckey Clover"/>
+      <toolTipText value="Lucky Clover"/>
     </properties>
     <border type="none" title="Lucky Clover" title-justification="2"/>
     <children>

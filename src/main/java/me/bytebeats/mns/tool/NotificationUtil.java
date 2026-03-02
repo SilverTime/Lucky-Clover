@@ -14,10 +14,10 @@ import com.intellij.openapi.project.ex.ProjectManagerEx;
  */
 
 public class NotificationUtil {
-    private static final String NOTIFICATION_TITLE = "Luckey Clover";
-    private static final String LOG_NOTIFICATION_GROUP = "Mns Log";
-    private static final String BALLOON_NOTIFICATION_GROUP = "Mns Balloon";
-    private static final String TOOL_WINDOW_NOTIFICATION_GROUP = "Mns Tool Window";
+    private static final String NOTIFICATION_TITLE = "Lucky Clover";
+    private static final String LOG_NOTIFICATION_GROUP = "Lucky Log";
+    private static final String BALLOON_NOTIFICATION_GROUP = "Lucky Balloon";
+    private static final String TOOL_WINDOW_NOTIFICATION_GROUP = "Lucky Tool Window";
 
     /**
      * messages on Event Log Window
