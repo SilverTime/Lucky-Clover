@@ -230,22 +230,29 @@ public class MainWindow implements ToolWindowFactory, OnSymbolSelectedListener {
     }
 
     /**
-     * 刷新所有窗口的数据（Profile 切换时调用）
-     * 注意：这里只调用 onInit 重新初始化 UI，不请求数据
-     * 数据请求由 tab 切换时触发
+     * 刷新所有窗口的数据（配置保存后调用）
+     * 重新初始化 UI 并刷新数据，确保配置变更立即生效
      */
     public void refreshAllWindows() {
         // 刷新股票窗口 UI
         stockWindow.onInit();
+        // 立即刷新股票数据
+        stockWindow.requestData();
         
         // 刷新基金窗口 UI
         fundWindow.onInit();
+        // 立即刷新基金数据
+        fundWindow.requestData();
         
         // 刷新加密货币窗口 UI
         digitalCurrencyWindow.onInit();
+        // 立即刷新加密货币数据
+        digitalCurrencyWindow.requestData();
         
         // 刷新核心指数窗口 UI
         indicesWindow.onInit();
+        // 立即刷新核心指数数据
+        indicesWindow.requestData();
         
         // 刷新 ToolWindow 内容的显示/隐藏
         refreshContentVisibility();

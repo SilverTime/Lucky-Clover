@@ -126,7 +126,7 @@ Lucky Clover 是一款基于 [mns (Money Never Sleeps)](https://github.com/byteb
 ### 🖼️ 界面预览
 
 #### 设置界面
-![设置界面](media/mns_settings.png)
+![设置界面](media/lc_settings.png)
 
 #### 股票行情
 ![股票行情](media/stocks.png)
@@ -353,7 +353,7 @@ Lucky Clover is a powerful IntelliJ platform plugin developed based on the [mns 
 ### 🖼️ Interface Preview
 
 #### Settings
-![Settings](media/mns_settings.png)
+![Settings](media/settings.png)
 
 #### Stocks
 ![Stocks](media/stocks.png)
