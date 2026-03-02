@@ -98,12 +98,23 @@ public abstract class AbstractHandler implements UISettingProvider {
     }
 
     protected void updateTimestamp() {
-        jLabel.setText(String.format(StringResUtils.REFRESH_TIMESTAMP, LocalDateTime.now().format(DateTimeFormatter.ofPattern(StringResUtils.TIMESTAMP_FORMATTER))));
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern(StringResUtils.TIMESTAMP_FORMATTER));
+        String marketStatus = getMarketStatusSuffix();
+        String fullText = String.format(StringResUtils.REFRESH_TIMESTAMP, timestamp) + marketStatus;
+        jLabel.setText(fullText);
         if (isInHiddenMode()) {
             jLabel.setForeground(JBColor.DARK_GRAY);
         } else {
             jLabel.setForeground(JBColor.RED);
         }
+    }
+    
+    /**
+     * 获取市场状态后缀（用于显示市场是否休市）
+     * 子类可以重写此方法返回对应的市场状态
+     */
+    protected String getMarketStatusSuffix() {
+        return "";
     }
 
     protected String[] handleColumnNames(String[] columnNames) {

@@ -2,6 +2,7 @@ package me.bytebeats.mns.handler;
 
 import me.bytebeats.mns.listener.MousePressedListener;
 import me.bytebeats.mns.network.HttpClientPool;
+import me.bytebeats.mns.tool.MarketTimeUtils;
 import me.bytebeats.mns.tool.NotificationUtil;
 import me.bytebeats.mns.meta.Stock;
 
@@ -14,6 +15,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TencentStockHandler extends AbsStockHandler {
+
+    // 标记是否已经请求过一次数据（用于非开市时间只请求一次）
+    private boolean hasRequestedOnce = false;
+    // 当前市场类型
+    private MarketType currentMarketType = MarketType.ALL;
+
+    public enum MarketType {
+        CN,    // A股
+        HK,    // 港股
+        US,    // 美股
+        ALL    // 全部市场
+    }
 
     public TencentStockHandler(JTable table, JLabel label) {
         super(table, label);
@@ -49,6 +62,9 @@ public class TencentStockHandler extends AbsStockHandler {
     @Override
     public void load(List<String> symbols) {
         stocks.clear();
+        // 重置请求标志
+        hasRequestedOnce = false;
+        
         if (timer == null) {
             timer = new Timer();
             updateFrequency();
@@ -62,6 +78,13 @@ public class TencentStockHandler extends AbsStockHandler {
         NotificationUtil.info("starts updating " + getTipText() + " stocks");
     }
 
+    /**
+     * 设置当前市场类型
+     */
+    public void setMarketType(MarketType marketType) {
+        this.currentMarketType = marketType;
+    }
+
     @Override
     protected String getTipText() {
         return jTable.getToolTipText();
@@ -69,6 +92,16 @@ public class TencentStockHandler extends AbsStockHandler {
 
     private void fetch(List<String> symbols) {
         if (symbols.isEmpty()) {
+            return;
+        }
+
+        // 检查市场是否开市
+        boolean isMarketOpen = isCurrentMarketOpen();
+        
+        // 如果市场未开市且已经请求过一次数据，则停止定时器
+        if (!isMarketOpen && hasRequestedOnce) {
+            stop();
+            NotificationUtil.info(getTipText() + " market is closed, stops updating");
             return;
         }
 
@@ -82,11 +115,48 @@ public class TencentStockHandler extends AbsStockHandler {
         try {
             String entity = HttpClientPool.getInstance().get(appendParams(params.toString()));
             parse(symbols, entity);
+            
+            // 标记已经请求过一次数据
+            hasRequestedOnce = true;
+            
+            // 如果市场未开市，请求一次后立即停止
+            if (!isMarketOpen) {
+                stop();
+                NotificationUtil.info(getTipText() + " market is closed, fetched data once");
+            }
         } catch (Exception e) {
             NotificationUtil.info(e.getMessage());
             timer.cancel();
             timer = null;
             NotificationUtil.info("stops updating " + jTable.getToolTipText() + " data because of " + e.getMessage());
+        }
+    }
+
+    /**
+     * 判断当前选择的市场是否开市
+     */
+    private boolean isCurrentMarketOpen() {
+        switch (currentMarketType) {
+            case CN:
+                return MarketTimeUtils.isCNMarketOpen();
+            case HK:
+                return MarketTimeUtils.isHKMarketOpen();
+            case US:
+                return MarketTimeUtils.isUSMarketOpen();
+            case ALL:
+            default:
+                // 全部市场：任一市场开市就继续刷新
+                return MarketTimeUtils.isCNMarketOpen() || MarketTimeUtils.isHKMarketOpen() || MarketTimeUtils.isUSMarketOpen();
+        }
+    }
+    
+    @Override
+    protected String getMarketStatusSuffix() {
+        boolean isOpen = isCurrentMarketOpen();
+        if (isOpen) {
+            return "";
+        } else {
+            return " (已休市)";
         }
     }
 

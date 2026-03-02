@@ -8,7 +8,7 @@
     <description><![CDATA[
     Lucky Clover!
     IntelliJ IDEA platform plugin. Supports instant stock market from USA, HK and China mainland.<br>
-    IntelliJ IDEA 平台插件, 支持<b>股票</b>, <b>基金</b>和<b>数字货币</b>的行情数据的实时更新, 其中股票包括<b>美股</b>, <b>港股</b>和宇宙第一大<b>A股</b>!.<br>
+    IntelliJ IDEA 平台插件, 支持<b>股票</b>, <b>基金</b>和<b>数字货币</b>的行情数据的实时更新, 其中股票包括<b>美股</b>, <b>港股</b>和<b>A股</b>!.<br>
     插件名为幸运草，希望大家都有好运!<br>
     Good luck!<br>
     The most important thing is: Try <b>lucky-clover</b> and spread the word!<br>
@@ -22,8 +22,8 @@
                 serviceImplementation="me.bytebeats.mns.ui.AppSettingState"/>
 
         <toolWindow
-                id="mns"
-                displayName="lc"
+                id="LuckyC"
+                displayName="LuckyC"
                 icon="/icon_mns.png"
                 anchor="left"
                 factoryClass="me.bytebeats.mns.ui.MainWindow"/>
