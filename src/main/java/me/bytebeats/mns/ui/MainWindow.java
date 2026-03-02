@@ -6,9 +6,12 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
+import com.intellij.ui.content.ContentManagerEvent;
+import com.intellij.ui.content.ContentManagerListener;
 import me.bytebeats.mns.OnSymbolSelectedListener;
 import me.bytebeats.mns.tool.StringResUtils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ public class MainWindow implements ToolWindowFactory, OnSymbolSelectedListener {
     private Content stockContent;
     private Content fundContent;
     private Content cryptoContent;
+    private Content indicesContent;
+    private Content stockDetailContent;
 
     // 保存 ContentManager 引用，用于刷新显示/隐藏
     private ContentManager contentManager;
@@ -78,7 +83,7 @@ public class MainWindow implements ToolWindowFactory, OnSymbolSelectedListener {
         AppSettingState settings = AppSettingState.getInstance();
 
         // 核心指数始终显示
-        Content indicesContent = contentFactory.createContent(indicesWindow.getJPanel(), StringResUtils.INDICES, true);
+        indicesContent = contentFactory.createContent(indicesWindow.getJPanel(), StringResUtils.INDICES, true);
         toolWindow.getContentManager().addContent(indicesContent);
 
         // 股票分组
@@ -94,11 +99,46 @@ public class MainWindow implements ToolWindowFactory, OnSymbolSelectedListener {
         toolWindow.getContentManager().addContent(cryptoContent);
 
         // 股票详情始终显示
-        Content stockDetailContent = contentFactory.createContent(stockDetailWindow.getJPanel(), StringResUtils.STOCK_DETAIL, true);
+        stockDetailContent = contentFactory.createContent(stockDetailWindow.getJPanel(), StringResUtils.STOCK_DETAIL, true);
         toolWindow.getContentManager().addContent(stockDetailContent);
 
         // 保存 ContentManager 引用，用于后续刷新显示/隐藏
         this.contentManager = toolWindow.getContentManager();
+
+        // 添加 ContentManagerListener 监听 tab 切换
+        this.contentManager.addContentManagerListener(new ContentManagerListener() {
+            @Override
+            public void contentAdded(@NotNull ContentManagerEvent event) {
+            }
+
+            @Override
+            public void contentRemoved(@NotNull ContentManagerEvent event) {
+            }
+
+            @Override
+            public void contentRemoveQuery(@NotNull ContentManagerEvent event) {
+            }
+
+            @Override
+            public void selectionChanged(@NotNull ContentManagerEvent event) {
+                Content selectedContent = event.getContent();
+                if (selectedContent == null) {
+                    return;
+                }
+                
+                // 根据选中的 Content 触发对应的数据请求
+                if (selectedContent == indicesContent) {
+                    indicesWindow.requestData();
+                } else if (selectedContent == stockContent) {
+                    stockWindow.requestData();
+                } else if (selectedContent == fundContent) {
+                    fundWindow.requestData();
+                } else if (selectedContent == cryptoContent) {
+                    digitalCurrencyWindow.requestData();
+                }
+                // stockDetailContent 不需要自动请求数据
+            }
+        });
 
         // 根据设置显示/隐藏各分组
         updateContentVisibility(settings);
@@ -140,6 +180,23 @@ public class MainWindow implements ToolWindowFactory, OnSymbolSelectedListener {
 
         // 初始根据设置显示/隐藏内容
         refreshContentVisibility(toolWindow.getContentManager());
+        
+        // 初始化时请求当前选中 tab 的数据
+        ContentManager contentManager = toolWindow.getContentManager();
+        if (contentManager != null) {
+            Content selectedContent = contentManager.getSelectedContent();
+            if (selectedContent != null) {
+                if (selectedContent == indicesContent) {
+                    indicesWindow.requestData();
+                } else if (selectedContent == stockContent) {
+                    stockWindow.requestData();
+                } else if (selectedContent == fundContent) {
+                    fundWindow.requestData();
+                } else if (selectedContent == cryptoContent) {
+                    digitalCurrencyWindow.requestData();
+                }
+            }
+        }
     }
 
     /**
@@ -173,20 +230,29 @@ public class MainWindow implements ToolWindowFactory, OnSymbolSelectedListener {
     }
 
     /**
-     * 刷新所有窗口的数据（Profile 切换时调用）
+     * 刷新所有窗口的数据（配置保存后调用）
+     * 重新初始化 UI 并刷新数据，确保配置变更立即生效
      */
     public void refreshAllWindows() {
-        // 刷新股票窗口
+        // 刷新股票窗口 UI
         stockWindow.onInit();
+        // 立即刷新股票数据
+        stockWindow.requestData();
         
-        // 刷新基金窗口
+        // 刷新基金窗口 UI
         fundWindow.onInit();
+        // 立即刷新基金数据
+        fundWindow.requestData();
         
-        // 刷新加密货币窗口
+        // 刷新加密货币窗口 UI
         digitalCurrencyWindow.onInit();
+        // 立即刷新加密货币数据
+        digitalCurrencyWindow.requestData();
         
-        // 刷新核心指数窗口
+        // 刷新核心指数窗口 UI
         indicesWindow.onInit();
+        // 立即刷新核心指数数据
+        indicesWindow.requestData();
         
         // 刷新 ToolWindow 内容的显示/隐藏
         refreshContentVisibility();

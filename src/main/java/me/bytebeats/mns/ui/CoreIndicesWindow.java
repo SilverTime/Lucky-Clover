@@ -67,8 +67,15 @@ public class CoreIndicesWindow implements SymbolParser {
         handler.stop();
         
         indices_sync.addActionListener(e -> {
-            syncRefresh();
+            requestData();
         });
+        // 不再自动请求数据，只在 tab 切换到对应栏目时请求
+    }
+    
+    /**
+     * 请求数据（仅在 tab 切换到对应栏目时调用）
+     */
+    public void requestData() {
         syncRefresh();
     }
 

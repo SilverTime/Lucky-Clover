@@ -34,9 +34,7 @@ public class StockWindow {
     private JLabel profile_label;
     private JLabel market_label;
 
-    private final AbsStockHandler handler;
-
-    private static final String[] markets = {StringResUtils.STOCK_ALL, StringResUtils.STOCK_US, StringResUtils.STOCK_HK, StringResUtils.STOCK_CN};
+    private final TencentStockHandler handler;
 
     public StockWindow() {
         handler = new TencentStockHandler(stock_table, stock_timestamp) {
@@ -84,11 +82,8 @@ public class StockWindow {
         // 初始化 Profile 下拉框
         initProfileComboBox();
         
-        // 初始化市场选择下拉框
-        stock_market_list.removeAllItems();
-        for (String market : markets) {
-            stock_market_list.addItem(market);
-        }
+        // 初始化市场选择下拉框（只显示有配置股票的市场）
+        initMarketComboBox();
         stock_market_list.addPopupMenuListener(new PopupMenuListener() {
             @Override
             public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
@@ -97,7 +92,7 @@ public class StockWindow {
 
             @Override
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-                syncRefresh();
+                requestData();
             }
 
             @Override
@@ -107,9 +102,74 @@ public class StockWindow {
         stock_market_list.setSelectedIndex(0);
         stock_refresh.addActionListener(e -> {
             handler.stop();
-            syncRefresh();
+            requestData();
         });
+        // 不再自动请求数据，只在 tab 切换到对应栏目时请求
+    }
+    
+    /**
+     * 请求数据（仅在 tab 切换到对应栏目时调用）
+     */
+    public void requestData() {
+        // 根据实际股票代码自动判断市场类型
+        autoDetectMarketType();
         syncRefresh();
+    }
+    
+    /**
+     * 根据用户配置的股票代码自动判断市场类型
+     * 优先使用手动选择的市场类型，只有选择"全部"时才自动检测
+     */
+    private void autoDetectMarketType() {
+        AppSettingState settings = AppSettingState.getInstance();
+        
+        // 获取选中的市场名称
+        String selectedMarket = (String) stock_market_list.getSelectedItem();
+        
+        // 手动选择特定市场时，优先使用手动选择
+        TencentStockHandler.MarketType marketType;
+        
+        if (StringResUtils.STOCK_US.equals(selectedMarket)) {
+            marketType = TencentStockHandler.MarketType.US;
+            handler.setMarketType(marketType);
+            return;
+        } else if (StringResUtils.STOCK_HK.equals(selectedMarket)) {
+            marketType = TencentStockHandler.MarketType.HK;
+            handler.setMarketType(marketType);
+            return;
+        } else if (StringResUtils.STOCK_CN.equals(selectedMarket)) {
+            marketType = TencentStockHandler.MarketType.CN;
+            handler.setMarketType(marketType);
+            return;
+        }
+        
+        // 全部或默认：根据配置判断
+        boolean hasCN = false;
+        boolean hasHK = false;
+        boolean hasUS = false;
+        
+        if (settings.showUSStocks && !isStockListEmpty(settings.usStocks)) {
+            hasUS = true;
+        }
+        if (settings.showHKStocks && !isStockListEmpty(settings.hkStocks)) {
+            hasHK = true;
+        }
+        if (settings.showCNStocks && (!isStockListEmpty(settings.shStocks) || !isStockListEmpty(settings.szStocks))) {
+            hasCN = true;
+        }
+        
+        // 根据实际有的市场类型设置
+        if (hasCN && !hasHK && !hasUS) {
+            marketType = TencentStockHandler.MarketType.CN;
+        } else if (!hasCN && hasHK && !hasUS) {
+            marketType = TencentStockHandler.MarketType.HK;
+        } else if (!hasCN && !hasHK && hasUS) {
+            marketType = TencentStockHandler.MarketType.US;
+        } else {
+            marketType = TencentStockHandler.MarketType.ALL;
+        }
+        
+        handler.setMarketType(marketType);
     }
     
     /**
@@ -158,6 +218,64 @@ public class StockWindow {
     }
     
     /**
+     * 初始化市场选择下拉框
+     * 只显示有配置股票的市场选项
+     */
+    private void initMarketComboBox() {
+        AppSettingState settings = AppSettingState.getInstance();
+        
+        stock_market_list.removeAllItems();
+        
+        // 始终添加"全部"选项
+        stock_market_list.addItem(StringResUtils.STOCK_ALL);
+        
+        // 检查各市场是否有配置股票，只添加有配置的市场
+        // US市场：需要showUSStocks开启且usStocks不为空
+        if (settings.showUSStocks && !isStockListEmpty(settings.usStocks)) {
+            stock_market_list.addItem(StringResUtils.STOCK_US);
+        }
+        
+        // HK市场：需要showHKStocks开启且hkStocks不为空
+        if (settings.showHKStocks && !isStockListEmpty(settings.hkStocks)) {
+            stock_market_list.addItem(StringResUtils.STOCK_HK);
+        }
+        
+        // CN市场：需要showCNStocks开启且shStocks或szStocks不为空
+        if (settings.showCNStocks && (!isStockListEmpty(settings.shStocks) || !isStockListEmpty(settings.szStocks))) {
+            stock_market_list.addItem(StringResUtils.STOCK_CN);
+        }
+        
+        // 添加PopupMenuListener
+        stock_market_list.addPopupMenuListener(new PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                handler.stop();
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                requestData();
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
+        });
+        
+        // 设置默认选中第一项
+        if (stock_market_list.getItemCount() > 0) {
+            stock_market_list.setSelectedIndex(0);
+        }
+    }
+    
+    /**
+     * 检查股票列表是否为空
+     */
+    private boolean isStockListEmpty(String stocks) {
+        return stocks == null || stocks.trim().isEmpty();
+    }
+    
+    /**
      * 切换 Profile
      */
     private void switchProfile(String profileName) {
@@ -175,39 +293,38 @@ public class StockWindow {
     public List<String> parse() {
         List<String> symbols = new ArrayList<>();
         AppSettingState settings = AppSettingState.getInstance();
-        switch (stock_market_list.getSelectedIndex()) {
-            case 1:
-                // 美股
-                if (settings.showUSStocks) {
-                    Arrays.stream(settings.usStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add("s_us" + s));
-                }
-                break;
-            case 2:
-                // 港股
-                if (settings.showHKStocks) {
-                    Arrays.stream(settings.hkStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add("s_hk" + s));
-                }
-                break;
-            case 3:
-                // A股
-                if (settings.showCNStocks) {
-                    String cnStocks = settings.shStocks + ";" + settings.szStocks;
-                    Arrays.stream(cnStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add(determineCnMarketPrefix(s) + s));
-                }
-                break;
-            default:
-                // 全部
-                if (settings.showUSStocks) {
-                    Arrays.stream(settings.usStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add("s_us" + s));
-                }
-                if (settings.showHKStocks) {
-                    Arrays.stream(settings.hkStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add("s_hk" + s));
-                }
-                if (settings.showCNStocks) {
-                    String allCnStocks = settings.shStocks + ";" + settings.szStocks;
-                    Arrays.stream(allCnStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add(determineCnMarketPrefix(s) + s));
-                }
-                break;
+        
+        // 获取选中的市场名称
+        String selectedMarket = (String) stock_market_list.getSelectedItem();
+        
+        if (StringResUtils.STOCK_US.equals(selectedMarket)) {
+            // 美股
+            if (settings.showUSStocks) {
+                Arrays.stream(settings.usStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add("s_us" + s));
+            }
+        } else if (StringResUtils.STOCK_HK.equals(selectedMarket)) {
+            // 港股
+            if (settings.showHKStocks) {
+                Arrays.stream(settings.hkStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add("s_hk" + s));
+            }
+        } else if (StringResUtils.STOCK_CN.equals(selectedMarket)) {
+            // A股
+            if (settings.showCNStocks) {
+                String cnStocks = settings.shStocks + ";" + settings.szStocks;
+                Arrays.stream(cnStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add(determineCnMarketPrefix(s) + s));
+            }
+        } else {
+            // 全部或默认
+            if (settings.showUSStocks) {
+                Arrays.stream(settings.usStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add("s_us" + s));
+            }
+            if (settings.showHKStocks) {
+                Arrays.stream(settings.hkStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add("s_hk" + s));
+            }
+            if (settings.showCNStocks) {
+                String allCnStocks = settings.shStocks + ";" + settings.szStocks;
+                Arrays.stream(allCnStocks.split("[,; ]")).filter(s -> !s.isEmpty()).forEach(s -> symbols.add(determineCnMarketPrefix(s) + s));
+            }
         }
         return symbols;
     }

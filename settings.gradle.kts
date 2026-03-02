@@ -9,4 +9,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "Lucky-Clover"
+rootProject.name = "lucky-clover"
