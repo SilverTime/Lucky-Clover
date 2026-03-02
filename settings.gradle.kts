@@ -9,4 +9,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "see-stock"
+rootProject.name = "Lucky-Clover"
